@@ -1,17 +1,18 @@
 import { useState } from 'react';
+import ImageUploadField from './ImageUploadField';
 
 const emptyForm = {
   name: '',
   description: '',
   category: 'coffee',
   price: '',
-  image_url: '',
   is_customizable: false,
   is_active: true,
 };
 
 export default function ProductForm({ initialValues, onSubmit, onCancel, submitLabel = 'Save' }) {
   const [form, setForm] = useState(() => ({ ...emptyForm, ...initialValues }));
+  const [imageFile, setImageFile] = useState(null);
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -27,9 +28,11 @@ export default function ProductForm({ initialValues, onSubmit, onCancel, submitL
       await onSubmit({
         ...form,
         price: Number(form.price),
+        image: imageFile,
       });
     } catch (err) {
-      setError(err.body?.message || err.message || 'Something went wrong.');
+      const firstError = err.body?.errors && Object.values(err.body.errors)[0]?.[0];
+      setError(firstError || err.body?.message || err.message || 'Something went wrong.');
     } finally {
       setSubmitting(false);
     }
@@ -38,6 +41,8 @@ export default function ProductForm({ initialValues, onSubmit, onCancel, submitL
   return (
     <form className="product-form" onSubmit={handleSubmit}>
       {error && <p className="form-error">{error}</p>}
+
+      <ImageUploadField currentImageUrl={initialValues?.image_url} onChange={setImageFile} />
 
       <label>
         Name
@@ -74,15 +79,6 @@ export default function ProductForm({ initialValues, onSubmit, onCancel, submitL
           required
           value={form.price}
           onChange={(e) => handleChange('price', e.target.value)}
-        />
-      </label>
-
-      <label>
-        Image URL
-        <input
-          type="text"
-          value={form.image_url ?? ''}
-          onChange={(e) => handleChange('image_url', e.target.value)}
         />
       </label>
 

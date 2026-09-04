@@ -5,7 +5,7 @@ export function fetchCustomerOrders(token) {
 }
 
 /**
- * @param {{items: Array<{product_id: string, quantity: number, customization_notes?: string}>, payment_reference?: string}} order
+ * @param {{items: Array<{product_id: string, quantity: number, customization_notes?: string}>, payment_reference?: string, redeem_points?: number, redeem_free_product_id?: string}} order
  */
 export function createOrder(order, token) {
   return apiFetch('/customer/orders', { method: 'POST', body: order, token });

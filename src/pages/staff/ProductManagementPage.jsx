@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { fetchProducts, createProduct, updateProduct, deleteProduct } from '../../api/products';
+import {
+  fetchProducts,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+  uploadProductImage,
+} from '../../api/products';
 import ProductForm from '../../components/ProductForm';
 
 export default function ProductManagementPage() {
@@ -27,13 +33,24 @@ export default function ProductManagementPage() {
   }, [load]);
 
   async function handleCreate(values) {
+    // createProduct sends multipart (uploading the image in the same
+    // request) when values.image is a File, plain JSON otherwise.
     await createProduct(values, employee.token);
     setCreating(false);
     load();
   }
 
   async function handleUpdate(id, values) {
-    await updateProduct(id, values, employee.token);
+    const { image, ...fields } = values;
+
+    await updateProduct(id, fields, employee.token);
+
+    // Image upload goes through its own dedicated endpoint, separate from
+    // the field update, so it's only called when a new file was chosen.
+    if (image) {
+      await uploadProductImage(id, image, employee.token);
+    }
+
     setEditingId(null);
     load();
   }
@@ -76,9 +93,16 @@ export default function ProductManagementPage() {
             </li>
           ) : (
             <li key={product.id} className="product-management-row">
-              <div>
-                <strong>{product.name}</strong> — ${product.price.toFixed(2)} ({product.category})
-                {!product.is_active && <span className="badge">inactive</span>}
+              <div className="product-management-row-info">
+                {product.image_url ? (
+                  <img className="product-management-thumb" src={product.image_url} alt={product.name} />
+                ) : (
+                  <div className="product-management-thumb" aria-hidden="true" />
+                )}
+                <div>
+                  <strong>{product.name}</strong> — ${product.price.toFixed(2)} ({product.category})
+                  {!product.is_active && <span className="badge">inactive</span>}
+                </div>
               </div>
               <div className="product-management-actions">
                 <button type="button" onClick={() => setEditingId(product.id)}>

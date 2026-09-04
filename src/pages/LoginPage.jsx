@@ -30,6 +30,16 @@ export default function LoginPage() {
   return (
     <div className="page page-narrow">
       <h1>Log in</h1>
+
+      <div className="demo-credentials">
+        <h4>Demo credentials</h4>
+        <p>
+          Email: <code>jane@example.com</code>
+          <br />
+          Password: <code>password123</code>
+        </p>
+      </div>
+
       <form onSubmit={handleSubmit}>
         {error && <p className="form-error">{error}</p>}
         <label>
@@ -45,6 +55,9 @@ export default function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
           />
         </label>
+        <p className="forgot-password-link">
+          <Link to="/forgot-password">Forgot password?</Link>
+        </p>
         <button type="submit" disabled={submitting}>
           {submitting ? 'Logging in...' : 'Log in'}
         </button>

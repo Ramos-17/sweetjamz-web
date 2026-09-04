@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 export default function StaffLoginPage() {
@@ -30,6 +30,16 @@ export default function StaffLoginPage() {
   return (
     <div className="page page-narrow">
       <h1>Staff log in</h1>
+
+      <div className="demo-credentials">
+        <h4>Demo credentials</h4>
+        <p>
+          Email: <code>gramos0617@gmail.com</code>
+          <br />
+          Password: <code>password123</code>
+        </p>
+      </div>
+
       <form onSubmit={handleSubmit}>
         {error && <p className="form-error">{error}</p>}
         <label>
@@ -45,6 +55,9 @@ export default function StaffLoginPage() {
             onChange={(e) => setPassword(e.target.value)}
           />
         </label>
+        <p className="forgot-password-link">
+          <Link to="/staff/forgot-password">Forgot password?</Link>
+        </p>
         <button type="submit" disabled={submitting}>
           {submitting ? 'Logging in...' : 'Log in'}
         </button>
